@@ -120,6 +120,7 @@ export class AuthModule {
   }
   public getAccount(): AccountInfo | null {
     if (!this.myMSALObj) {
+      console.log("here1");
       return AuthModule.msalAppNotCreated();
     }
     // need to call getAccount here?
@@ -135,10 +136,10 @@ export class AuthModule {
         "Multiple accounts detected, need to add choose account code.",
         currentAccounts
       );
-      this.myMSALObj.setActiveAccount(currentAccounts[0])
+      this.myMSALObj.setActiveAccount(currentAccounts[0]);
       return currentAccounts[0];
     } else if (currentAccounts.length === 1) {
-      this.myMSALObj.setActiveAccount(currentAccounts[0])
+      this.myMSALObj.setActiveAccount(currentAccounts[0]);
       return currentAccounts[0];
     }
 
@@ -174,7 +175,6 @@ export class AuthModule {
     }
     if (this.account) {
       this.silentLoginRequest.loginHint = this.account.username || "";
-      console.log("User: ", this.account);
     }
   }
 
@@ -238,7 +238,6 @@ export class AuthModule {
     const logOutRequest: EndSessionRequest = {
       account,
     };
-
     this.myMSALObj.logoutRedirect(logOutRequest);
   }
 
@@ -246,12 +245,13 @@ export class AuthModule {
    * Gets a token silently, or falls back to interactive redirect.
    */
   public async getTokenRedirect(): Promise<string | null> {
+    console.log("call gettokenredirect");
     if (!this.myMSALObj) {
       return AuthModule.msalAppNotCreated();
     }
+    this.getAccount();
     const account = this.myMSALObj.getActiveAccount();
     if (account) {
-      console.log('here acc', account);
       this.silentProfileRequest = { ...this.silentProfileRequest, account };
       try {
         const response = await this.myMSALObj.acquireTokenSilent(
@@ -270,7 +270,6 @@ export class AuthModule {
         }
       }
     }
-console.log('no acc');
     return null;
   }
 }
